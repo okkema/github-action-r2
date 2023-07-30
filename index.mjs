@@ -26,6 +26,7 @@ const DESTINATION_DIR = core.getInput("destination_dir", {
   required: false,
 })
 
+// R2 Client
 const client = new S3Client({
   credentials: {
     accessKeyId: R2_ACCESS_KEY, 
@@ -39,17 +40,15 @@ const paths = klawSync(SOURCE_DIR, {
 })
 
 function upload(input) {
-  return new Promise((resolve) => {
-    client.send(new PutObjectCommand(input))
-      .then(() => {
-        core.info(`uploaded - ${input.Key}`)
-        resolve(input.Key)
-      })
-      .catch(err => core.error(err))
-  })
+  return client.send(new PutObjectCommand(input))
+    .then(() => {
+      core.info(`Uploaded - ${input.Key}`)
+    })
+    .catch(err => core.error(err))
 }
 
 function run() {
+  core.info("Starting...")
   const sourceDir = slash(path.join(process.cwd(), SOURCE_DIR))
   return Promise.all(
     paths.map((p) => {
@@ -69,11 +68,10 @@ function run() {
 }
 
 run()
-  .then((locations) => {
-    core.info(`object key - ${DESTINATION_DIR}`)
-    core.info(`object locations - ${locations}`)
+  .then(() => {
+    core.info("Finished!")
   })
-  .catch((err) => {
+  .catch(err => {
     core.error(err)
     core.setFailed(err.message)
   })

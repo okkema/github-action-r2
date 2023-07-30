@@ -48812,14 +48812,12 @@ var paths = (0, import_klaw_sync.default)(SOURCE_DIR, {
   nodir: true
 });
 function upload(input) {
-  return new Promise((resolve) => {
-    client.send(new import_client_s3.PutObjectCommand(input)).then(() => {
-      import_core.default.info(`uploaded - ${input.Key}`);
-      resolve(input.Key);
-    }).catch((err) => import_core.default.error(err));
-  });
+  return client.send(new import_client_s3.PutObjectCommand(input)).then(() => {
+    import_core.default.info(`Uploaded - ${input.Key}`);
+  }).catch((err) => import_core.default.error(err));
 }
 function run() {
+  import_core.default.info("Starting...");
   const sourceDir = slash(import_path.default.join(process.cwd(), SOURCE_DIR));
   return Promise.all(
     paths.map((p) => {
@@ -48837,9 +48835,8 @@ function run() {
     })
   );
 }
-run().then((locations) => {
-  import_core.default.info(`object key - ${DESTINATION_DIR}`);
-  import_core.default.info(`object locations - ${locations}`);
+run().then(() => {
+  import_core.default.info("Finished!");
 }).catch((err) => {
   import_core.default.error(err);
   import_core.default.setFailed(err.message);
